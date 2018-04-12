@@ -26,8 +26,8 @@ namespace BigtableGrpc
             _settings = settings;
 
             var path = Directory.GetCurrentDirectory();
-            ChannelCredentials channelCredentials = GoogleCredential.FromFile(path + "/Grass-Clump-479-b5c624400920.json").ToChannelCredentials();
-            //ChannelCredentials channelCredentials = GoogleCredential.FromComputeCredential().ToChannelCredentials();
+            //ChannelCredentials channelCredentials = GoogleCredential.FromFile(path + "/Grass-Clump-479-b5c624400920.json").ToChannelCredentials();
+            ChannelCredentials channelCredentials = GoogleCredential.FromComputeCredential().ToChannelCredentials();
 
             myClient = new BigtableTestClient(new Bigtable.BigtableClient(GetChannel(channelCredentials)));
         }
