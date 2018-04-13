@@ -35,13 +35,13 @@ namespace BigtableGrpc
         internal async Task<int> Scan(LongConcurrentHistogram histogramScan)
         {
             _stringFormat = "D" + _settings.RowKeySize;
-            _table = "projects/grass-clump-479/instances/dotnet-perf/tables/scantest";
+            _table = "projects/grass-clump-479/instances/" + _settings.InstanceId + "/tables/" + _settings.TableName;
 
             var runtime = Stopwatch.StartNew();
 
             ReadErrors = 0;
 
-            Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} Starting Scan test against table {_settings.TableName} for {_settings.ScanTestDurationMinutes} minutes at {_settings.RowsLimit} rows chunks");
+            Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} Starting Scan test, instance {_settings.InstanceId} against table {_settings.TableName} for {_settings.ScanTestDurationMinutes} minutes at {_settings.RowsLimit} rows chunks");
 
             var rowsRead = 0;
             var r = new Random();

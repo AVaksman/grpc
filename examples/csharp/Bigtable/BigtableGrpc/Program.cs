@@ -68,6 +68,8 @@ namespace BigtableGrpc
             stopWatch.Stop();
 
             runner.WriteCsvToConsole(stopWatch.Elapsed, rowCount, testHistogram);
+
+            runner.WriteCsv(stopWatch.Elapsed, rowCount, testHistogram);
         }
     }
 }
