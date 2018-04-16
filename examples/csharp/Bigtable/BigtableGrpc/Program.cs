@@ -34,7 +34,8 @@ namespace BigtableGrpc
                 { "r|rows=", "RowKey spectrum/total rows loaded", v => settings.Records = Convert.ToInt64(v)},
                 { "m|minutes=", "Scan test duration minutes", v => settings.ScanTestDurationMinutes = Convert.ToInt32(v)},
                 { "b|batch=", "ReadRows batch size rows", v => settings.RowsLimit = Convert.ToInt64(v)},
-                { "t|table=", "Table name", v => settings.TableName = v},
+                { "T|Table=", "Table name", v => settings.TableName = v},
+                { "n|number=", "number of gRPC channels", v => settings.Channels = Convert.ToInt32(v)},
                 { "H|Help", "Show this message and exit", v => showHelp = v != null },
             };
 
@@ -68,8 +69,6 @@ namespace BigtableGrpc
             stopWatch.Stop();
 
             runner.WriteCsvToConsole(stopWatch.Elapsed, rowCount, testHistogram);
-
-            runner.WriteCsv(stopWatch.Elapsed, rowCount, testHistogram);
         }
     }
 }

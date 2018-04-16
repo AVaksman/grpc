@@ -17,31 +17,34 @@ namespace BigtableGrpc
     {
         private readonly BigtableGrpcSettings _settings;
         private int ReadErrors;
-        private readonly BigtableTestClient myClient;
         private static string _stringFormat;
         private static string _table;
+        private static readonly List<BigtableTestClient> BTtestClientPool = new List<BigtableTestClient>();
+        private static int ChPoolSize;
+        private static int chNum;
 
         internal BigtableGrpcScanTest(BigtableGrpcSettings settings)
         {
             _settings = settings;
-
             var path = Directory.GetCurrentDirectory();
-            //ChannelCredentials channelCredentials = GoogleCredential.FromFile(path + "/Grass-Clump-479-b5c624400920.json").ToChannelCredentials();
-            ChannelCredentials channelCredentials = GoogleCredential.FromComputeCredential().ToChannelCredentials();
+            ChannelCredentials channelCredentials = GoogleCredential.FromFile(path + "/Grass-Clump-479-b5c624400920.json").ToChannelCredentials();
+            //ChannelCredentials channelCredentials = GoogleCredential.FromComputeCredential().ToChannelCredentials();
 
-            myClient = new BigtableTestClient(new Bigtable.BigtableClient(GetChannel(channelCredentials)));
+            ChPoolSize = _settings.Channels;
+            FillChannelPool(channelCredentials);
         }
 
         internal async Task<int> Scan(LongConcurrentHistogram histogramScan)
         {
             _stringFormat = "D" + _settings.RowKeySize;
-            _table = "projects/grass-clump-479/instances/" + _settings.InstanceId + "/tables/" + _settings.TableName;
+            _table = "projects/grass-clump-479/instances/" + _settings.InstanceId + "/tables/scantest";
 
             var runtime = Stopwatch.StartNew();
 
             ReadErrors = 0;
 
-            Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} Starting Scan test, instance {_settings.InstanceId} against table {_settings.TableName} for {_settings.ScanTestDurationMinutes} minutes at {_settings.RowsLimit} rows chunks");
+            Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} Starting Scan test. Instance {_settings.InstanceId} against table {_settings.TableName} for {_settings.ScanTestDurationMinutes} minutes at {_settings.RowsLimit} rows chunks");
+            Console.WriteLine($"Channels: {BTtestClientPool.Count}");
 
             var rowsRead = 0;
             var r = new Random();
@@ -59,7 +62,7 @@ namespace BigtableGrpc
 #if DEBUG
                     Console.WriteLine($"Scanning beginning with rowkey {rowKey.ToStringUtf8()}");
 #endif
-                    var response = myClient.SendReadRowsRequest(readRowRerquest);
+                    var response = BTtestClientPool[chNum++ % ChPoolSize].SendReadRowsRequest(readRowRerquest);
                     rowsRead += await CheckReadAsync(response).ConfigureAwait(false);
 
 #if DEBUG
@@ -79,7 +82,6 @@ namespace BigtableGrpc
                     histogramScan.RecordValue((long)(responseTime.TotalMilliseconds * 100));
                 }
             }
-
             return rowsRead;
         }
 
@@ -123,6 +125,14 @@ namespace BigtableGrpc
             return new Channel("bigtable.googleapis.com", 443, channelCredentials, channelOptions);
         }
 
+        private void FillChannelPool(ChannelCredentials channelCredentials)
+        {
+            for (int i = 0; i < ChPoolSize; i++)
+            {
+                BTtestClientPool.Add(new BigtableTestClient(new Bigtable.BigtableClient(GetChannel(channelCredentials))));
+            }
+        }
+
         public void WriteCsvToConsole(TimeSpan scanDuration, int rowsRead, LongConcurrentHistogram hScan)
         {
             try
@@ -138,7 +148,7 @@ namespace BigtableGrpc
 
         public void WriteCsv(TimeSpan scanDuration, int rowsRead, LongConcurrentHistogram hScan)
         {
-            string path = Directory.GetParent(Directory.GetCurrentDirectory()).ToString() + $"/csv/scan_test_{DateTime.Now:MM_dd_yy_HH_mm}.csv";
+            string path = Directory.GetParent(Directory.GetCurrentDirectory()) + $"/csv/scan_test_{DateTime.Now:MM_dd_yy_HH_mm}.csv";
 
             try
             {
