@@ -90,6 +90,7 @@ namespace BigtableGrpc
             {
                 TableName = _table,
                 RowsLimit = _settings.RowsLimit,
+                Rows = new RowSet { RowRanges = { new RowRange{StartKeyOpen = rowKey}}},
                 Filter = new RowFilter { CellsPerColumnLimitFilter = 1 }
             };
 
