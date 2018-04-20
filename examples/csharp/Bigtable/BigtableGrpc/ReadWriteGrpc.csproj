@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Api.Gax.Grpc" Version="2.3.0" />
+    <PackageReference Include="Google.Apis" Version="1.32.2" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.32.2" />
+    <PackageReference Include="Google.Cloud.Bigtable.Admin.V2" Version="0.2.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.5.1" />
+    <PackageReference Include="Grpc" Version="1.11.0-pre2" />
+    <PackageReference Include="HdrHistogram" Version="2.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
+    <PackageReference Include="Mono.Options.Core" Version="1.0.0" />
+    <PackageReference Include="protobuf" Version="2.6.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Grpc.Auth">
+      <HintPath>..\..\..\..\src\csharp\Grpc.Auth\bin\Debug\netstandard1.5\Grpc.Auth.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
